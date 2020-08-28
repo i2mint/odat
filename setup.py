@@ -25,8 +25,12 @@ root_url = c['metadata']['root_url']
 more_setup_kwargs = dict(
     c['metadata'],
     install_requires=[
+        'matplotlib',
         'py2store',
-        'slang'
+        'slang',
+        'soundfile',
+        'scikit-learn',
+        'pandas'
     ],
     keywords=['data', 'data access', 'data preperation', 'machine learning', 'artificial intelligence'],
 )
@@ -34,7 +38,7 @@ more_setup_kwargs = dict(
 # import os
 # name = os.path.split(os.path.dirname(__file__))[-1]
 
-version = '0.0.1'  # edit if you want to specify the version here (should be a string)
+version = '0.0.2'  # edit if you want to specify the version here (should be a string)
 if version is None:
     try:
         from pip_packaging import next_version_for_package
@@ -71,14 +75,13 @@ dflt_kwargs = dict(
     platforms='any',
     long_description=readme(),
     long_description_content_type="text/markdown",
-
 )
 
 setup_kwargs = dict(dflt_kwargs, **more_setup_kwargs)
 
 ##########################################################################################
 # Diagnose setup_kwargs
-_, containing_folder_name = os.path.split(os.path.dirname(__file__))[-1]
+_, containing_folder_name = os.path.split(os.path.dirname(__file__))
 if setup_kwargs['name'] != containing_folder_name:
     print(f"!!!! containing_folder_name={containing_folder_name} but setup name is {setup_kwargs['name']}")
 
