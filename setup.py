@@ -2,6 +2,7 @@ import os
 from configparser import ConfigParser
 from setuptools import find_packages
 
+version = None
 
 def my_setup(print_params=True, **setup_kwargs):
     from setuptools import setup
@@ -38,7 +39,7 @@ more_setup_kwargs = dict(
 # import os
 # name = os.path.split(os.path.dirname(__file__))[-1]
 
-version = '0.0.2'  # edit if you want to specify the version here (should be a string)
+# version = '0.0.2'  # edit if you want to specify the version here (should be a string)
 if version is None:
     try:
         from pip_packaging import next_version_for_package
