@@ -31,7 +31,9 @@ def mk_kv_data_source(local_source_dir=DFLT_LOCAL_SOURCE_DIR,
 
 
 def mk_dacc(local_source_dir=DFLT_LOCAL_SOURCE_DIR,
-            key_to_tag=first_path_component, key_filt=None):
+            key_to_tag=first_path_component,
+            wf_to_chk=DFLT_CHUNKER,
+            key_filt=None):
     assert local_source_dir is not None, "You need to specify the directory where your data is"
     s = WavLocalFileStore(os.path.join(local_source_dir, '{tag}/{filename}.wav'))
 

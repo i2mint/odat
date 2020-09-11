@@ -7,35 +7,10 @@ import numpy as np
 import pandas as pd
 import soundfile as sf
 from py2store import FilesOfZip, KvReader, wrap_kvs, filtered_iter, cached_keys
-
-
-##################################  CHUNKER AND SPECTRA  ##################################
-def clever_chunker(gen_to_chunk, tile_size, tile_step=None):
-    """
-    Yield the items from gen_to_chunk into groups of consecutive terms of size tile_size.
-    Tile_step controls the offsets from one group to another.
-    :param gen_to_chunk: a generator/list
-    :param tile_size: the size of the chunks
-    :param tile_step: the step from one chunk to the next
-    :return: a generator
-    """
-    if tile_step is None:
-        tile_step = tile_size
-    # add or remove terms to make sure the one liner initialize correctly
-    init = (tile_size - int(tile_size / tile_step) * tile_step)
-    if init > 0 and tile_step > init:
-        gen_to_chunk = chain(['junk'] * (tile_step - init), gen_to_chunk)
-        d = deque([], tile_size)
-    else:
-        d = deque(list(islice(gen_to_chunk, init)), tile_size)
-    # the one liner
-    res = dropwhile(lambda x: len(x) < tile_size,
-                    map(lambda x: tuple(d), map(d.extend, zip(*([iter(gen_to_chunk)] * tile_step)))))
-    return res
-
+from odat.utils.chunkers import clever_chunker
 
 DFLT_CHK_SIZE = 2048
-DFLT_CHK_STEP = 2048
+DFLT_CHK_STEP = None
 DFLT_CHUNKER = partial(clever_chunker, tile_size=DFLT_CHK_SIZE, tile_step=DFLT_CHK_STEP)
 # A function to be applied to the raw fft output
 DFLT_SPECTRA_TRANS = lambda x: np.abs(x)
@@ -62,8 +37,8 @@ def mk_wf_store(zip_file_path, wf_folder):
 
     # making the two stores on which the dacc will be build
     wfs = WfStore(zip_file_path)  # access the wf
-    wfs_list = list(wfs)
-    t = ", ".join(list(wfs)[:3])
+    # wfs_list = list(wfs)
+    # t = ", ".join(list(wfs)[:3])
     return wfs
 
 

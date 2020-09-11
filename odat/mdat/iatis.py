@@ -2,13 +2,14 @@ import os
 from itertools import chain
 from collections import Counter
 from warnings import warn
+import re
+from io import BytesIO
 
 import pandas as pd
 import numpy as np
-from py2store.stores.s3_store import S3BinaryStore
-import re
-from io import BytesIO
 import soundfile as sf
+
+from py2store.stores.s3_store import S3BinaryStore
 
 from py2store import (
     LocalJsonStore,
