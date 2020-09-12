@@ -24,12 +24,14 @@ dflt_data_rootdir = ojoin(odat_subdir)
 
 from py2store import myconfigs
 
+ro_client_kwargs = None
 try:
     ro_client_kwargs = myconfigs['oto.ini']['s3_all_ro']
 except Exception:
     warn("You don't have the myconfigs['oto.ini']['s3_all_ro'], which I need to be able to access s3. "
          "This means you won't be able to access the audio data.")
 
+assert ro_client_kwargs is not None
 
 def delete_empty_records(s):
     """To delete all empty (i.e. length 0) items of a store"""
@@ -75,7 +77,8 @@ class TagSrefs(DfGroupReader):
 
 
 s3_path_p = re.compile('^(?P<protocol>[^:]+)://(?P<bucket>[^/]+)/(?P<path>.*)')
-
+s3_chks_tmpl = 's3://{group}/learn_mode/sounds/{user}/{channel}/{day}/{bt}_{tt}'
+local_chks_tmpl = '{group}/{user}/{channel}/{day}/{bt}_{tt}'
 
 def parse_sref(k):
     m = s3_path_p.match(k)
@@ -86,17 +89,29 @@ def parse_sref(k):
         raise KeyError(f"Your key couldn't be parsed: {k}")
 
 
-def mk_sref_wav_reader(resource_kwargs):
-    def get_wfsr(k):
+def mk_sref_bytes_reader(resource_kwargs):
+    """Make a function that takes s3://... template keys to s3 resrouces, and returns bytes"""
+
+    def get_bytes_from_s3(k):
         protocol, bucket, path = parse_sref(k)
         assert protocol == 's3', f"That wasn't an s3 path: {k}"
         b = S3BinaryStore(bucket, '', resource_kwargs)[path]
-        return sf.read(BytesIO(b))
+        return b
+
+    return get_bytes_from_s3
+
+
+def mk_sref_wf_reader(resource_kwargs):
+    get_bytes_from_s3 = mk_sref_bytes_reader(resource_kwargs)
+
+    def get_wfsr(k):
+        return sf.read(BytesIO(get_bytes_from_s3(k)))
 
     return get_wfsr
 
 
-get_wfsr = mk_sref_wav_reader(ro_client_kwargs)
+get_bytes_from_s3 = mk_sref_bytes_reader(ro_client_kwargs)
+get_wfsr = mk_sref_wf_reader(ro_client_kwargs)
 
 
 class Dacc:
@@ -123,6 +138,11 @@ class Dacc:
             if assert_sr is not None:
                 assert sr == assert_sr, f"You are asserting sr={assert_sr}, but I got {sr}"
             yield tag, wf
+
+    def sref_tag_bytes_gen(self, tags):
+        for tag in tags:
+            for sref in self.sref_tag_store[tag]:
+                yield sref, tag, get_bytes_from_s3(sref)
 
     def sref_tag_wfsr_gen(self, tags):
         for tag in tags:
