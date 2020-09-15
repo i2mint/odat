@@ -1,4 +1,4 @@
-from py2store import FilesOfZip, filtered_iter, wrap_kvs, lazyprop
+from py2store import FilesOfZip, filt_iter, wrap_kvs, lazyprop
 import soundfile as sf
 from io import BytesIO
 import re
@@ -26,7 +26,7 @@ def key_to_tag(key):
 
 
 @wrap_kvs(obj_of_data=get_wf)
-@filtered_iter(lambda x: not x.startswith('__MACOSX') and not x.endswith('DS_Store'))
+@filt_iter(filt=lambda x: not x.startswith('__MACOSX') and not x.endswith('DS_Store'))
 class Wavs(FilesOfZip):
     pass
 

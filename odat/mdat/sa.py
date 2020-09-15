@@ -6,7 +6,7 @@ import os
 import numpy as np
 import pandas as pd
 import soundfile as sf
-from py2store import FilesOfZip, KvReader, wrap_kvs, filtered_iter, cached_keys
+from py2store import FilesOfZip, KvReader, wrap_kvs, filt_iter, cached_keys
 from odat.utils.chunkers import clever_chunker
 
 DFLT_CHK_SIZE = 2048
@@ -30,7 +30,7 @@ def mk_wf_store(zip_file_path, wf_folder):
         key_of_id=lambda x: x[wf_folder_size + 1:],
         id_of_key=lambda x: os.path.join(wf_folder, x),
         obj_of_data=lambda b: sf.read(BytesIO(b), dtype='int16')[0])
-    @filtered_iter(lambda x: x.endswith('.wav'))
+    @filt_iter(filt=lambda x: x.endswith('.wav'))
     class WfStore(FilesOfZip):
         """Waveform access. Keys are .wav filenames and values are numpy arrays of int16 waveform."""
         pass
@@ -50,7 +50,7 @@ def mk_context_store(zip_file_path):
              files
     """
 
-    @filtered_iter(lambda x: x.endswith('.csv'))
+    @filt_iter(filt=lambda x: x.endswith('.csv'))
     @wrap_kvs(obj_of_data=lambda b: pd.read_csv(BytesIO(b)))
     class CSVStore(FilesOfZip):
         pass
