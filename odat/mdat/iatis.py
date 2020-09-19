@@ -192,3 +192,36 @@ class Dacc:
     @lazyprop
     def tag_counts(self):
         return pd.Series(Counter(self.sref_tag_df['tag'])).sort_values(ascending=False)
+
+    @lazyprop
+    def tagged_fvs_of_users(self):
+        """A store whose keys are (group, user) pairs and values are (_id, deviceHwId, tag, fv) DataFrames"""
+        from py2store import FilesOfZip, kv_wrap
+        import json
+
+        class TaggedFvsTrans:
+            def _id_of_key(self, k):
+                return self.rootdir + '/'.join(k)
+
+            def _key_of_id(self, _id):
+                return tuple(_id[len(self.rootdir):].split('/'))
+
+            def _obj_of_data(self, data):
+                return pd.DataFrame(json.loads(data.decode()))
+
+            # The key mapping depends on a rootdir attr that needs to be defined in the class that will be wrapped.
+            # To indicate this to the user (and your IDE linter) you can do this:
+
+            # rootdir = None  # to be defined in subclass
+            # or this:
+            @property
+            def rootdir(self):
+                raise NotImplementedError("This is supposed to be set in the class that will be wrapped")
+
+        from py2store import kv_wrap
+
+        @kv_wrap(TaggedFvsTrans)
+        class TaggedFvs(FilesOfZip):
+            rootdir = self._fv_mgc_subdir + '/'  # you could also write a new __init__ that would take it as a arg (+ the ones of FilesOfZip)
+
+        return TaggedFvs(self._fv_mgc_zip_filepath)
