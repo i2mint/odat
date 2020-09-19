@@ -33,6 +33,7 @@ except Exception:
 
 assert ro_client_kwargs is not None
 
+
 def delete_empty_records(s):
     """To delete all empty (i.e. length 0) items of a store"""
     for k, v in s.items():
@@ -79,6 +80,7 @@ class TagSrefs(DfGroupReader):
 s3_path_p = re.compile('^(?P<protocol>[^:]+)://(?P<bucket>[^/]+)/(?P<path>.*)')
 s3_chks_tmpl = 's3://{group}/learn_mode/sounds/{user}/{channel}/{day}/{bt}_{tt}'
 local_chks_tmpl = '{group}/{user}/{channel}/{day}/{bt}_{tt}'
+
 
 def parse_sref(k):
     m = s3_path_p.match(k)
@@ -169,6 +171,10 @@ class Dacc:
                 df.to_pickle(self._path_sref_tag_df_pkl)
 
         return df
+
+    @lazyprop
+    def _fv_mgc_zip_filepath(self):
+        return self.djoin(self._fv_mgc_subdir + '.zip')
 
     @lazyprop
     def _path_sref_tag_df_pkl(self):
