@@ -28,10 +28,11 @@ ro_client_kwargs = None
 try:
     ro_client_kwargs = myconfigs['oto.ini']['s3_all_ro']
 except Exception:
+    pass
+
+if ro_client_kwargs is None:
     warn("You don't have the myconfigs['oto.ini']['s3_all_ro'], which I need to be able to access s3. "
          "This means you won't be able to access the audio data.")
-
-assert ro_client_kwargs is not None
 
 
 def delete_empty_records(s):
