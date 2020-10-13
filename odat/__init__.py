@@ -63,7 +63,7 @@ def dacc_info_gen(on_error='ignore'):
             submodule_dotpath = src + '.' + submodule_name
             submodule = import_module(submodule_dotpath)
             d = getattr(submodule, '_meta')
-            yield d['name'], d
+            yield submodule_name, d
         except Exception as e:
             if on_error == 'raise':
                 raise
