@@ -156,3 +156,10 @@ class Dacc:
         """Yields the (fft, tag) pairs"""
         for chk, tag, extra in self.chk_tag_gen():
             yield self._get_tile_fft(chk), tag, extra
+
+
+_meta = dict(
+    name='sa',
+    description='Loose screws in rotating car dashboard',
+    mk_dacc=Dacc
+)

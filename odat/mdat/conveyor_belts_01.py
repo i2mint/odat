@@ -72,3 +72,10 @@ class Dacc:
     def get_xy_sample(self, n=400):
         idx = np.random.choice(range(len(self.tags)), size=n, replace=False)
         return self.spectras[idx], self.tags[idx]
+
+
+_meta = dict(
+    name='conveyor_belts_01',
+    description='Conveyor belts',
+    mk_dacc=Dacc,
+)

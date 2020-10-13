@@ -10,7 +10,6 @@ from odat.utils.chunkers import fixed_step_chunker
 
 DFLT_CHUNKER = partial(fixed_step_chunker, chk_size=2048)
 
-
 config_filename = 'xe.json'
 DFLT_LOCAL_SOURCE_DIR = myconfigs.get_config_value(config_filename, 'local_source_dir')
 
@@ -49,4 +48,8 @@ def mk_dacc(local_source_dir=DFLT_LOCAL_SOURCE_DIR,
     return Dacc(s, key_to_tag=key_to_tag, key_filt=key_filt)
 
 
-dacc = mk_dacc()
+_meta = dict(
+    name='xe',
+    description='Fridge compressor data',
+    mk_dacc=mk_dacc
+)

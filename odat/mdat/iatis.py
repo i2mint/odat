@@ -136,11 +136,15 @@ class Dacc:
         for sref in srefs_selected:
             yield sref, get_wfsr(sref)
 
-    def tag_wf_gen(self, tags, assert_sr):
+    def wf_tag_gen(self, tags, assert_sr):
+        """Get a (wf, tag) pairs iterator for given tags"""
         for sref, tag, (wf, sr) in self.sref_tag_wfsr_gen(tags):
             if assert_sr is not None:
                 assert sr == assert_sr, f"You are asserting sr={assert_sr}, but I got {sr}"
-            yield tag, wf
+            yield wf, tag
+
+    def tag_wf_gen(self, tags, assert_sr):
+        yield from ((tag, wf) for wf, tag in self.wf_tag_gen(tags, assert_sr))
 
     def sref_tag_bytes_gen(self, tags):
         for tag in tags:
@@ -226,3 +230,10 @@ class Dacc:
             rootdir = self._fv_mgc_subdir + '/'  # you could also write a new __init__ that would take it as a arg (+ the ones of FilesOfZip)
 
         return TaggedFvs(self._fv_mgc_zip_filepath)
+
+
+_meta = dict(
+    name='iatis',
+    description='Over 5 million tagged sounds',
+    mk_dacc=Dacc
+)

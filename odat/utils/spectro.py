@@ -151,38 +151,39 @@ def spectr(wf, sr=None, tile_size=DFLT_TILE_SIZE, tile_step=None, win_func=DFLT_
     return abs_stft(wf, tile_size=tile_size, tile_step=tile_step, win_func=win_func)
 
 
-try:
-    import librosa
-
-
-    def log_mel_of_wf_sr(wf, sr, common_sr=DFLT_SR):
-        if common_sr is None:
-            feat_mat = librosa.feature.melspectrogram(wf, sr=sr, **DFLT_MEL_KWARGS)
-        else:
-            _assert_sample_rate_if_not_none(common_sr, sr)
-            feat_mat = librosa.feature.melspectrogram(wf, sr=common_sr, **DFLT_MEL_KWARGS)
-        return librosa.db_to_amplitude(feat_mat, ref=DFLT_MEL_MIN_AMP).T  # TODO: Look into
-
-
-    def onset_strength_and_spectral_contrast(wf, sr):
-        onset_strength = librosa.onset.onset_strength(wf, sr)
-        spectral_contrast = librosa.feature.spectral_contrast(wf, sr)
-        return np.vstack((onset_strength, spectral_contrast)).T  # TODO: Look into
-
-
-    # TODO: Look into this!
-    def intensity_and_spectral_features(wf, sr, tile_size=DFLT_TILE_SIZE, tile_step=None):
-        tile_step = tile_step or tile_size
-        S = abs_stft(wf, tile_size=tile_size, tile_step=tile_step)
-        log_intensity = log(S.sum(axis=0) + 1)
-        onset_strength = librosa.onset.onset_strength(sr=sr, S=S)
-        spectral_centroid = librosa.feature.spectral_centroid(sr=sr, S=S, n_fft=tile_size, hop_length=tile_step)
-        spectral_contrast = librosa.feature.spectral_contrast(sr=sr, S=S, n_fft=tile_size, hop_length=tile_step)
-        return np.vstack((log_intensity, onset_strength, spectral_centroid, spectral_contrast)).T  # TODO: Look into
-except ImportError as e:
-    from warnings import warn
-
-    warn(str(e))
+# Note: Removing until librosa gets it's act together
+# try:
+#     import librosa
+#
+#
+#     def log_mel_of_wf_sr(wf, sr, common_sr=DFLT_SR):
+#         if common_sr is None:
+#             feat_mat = librosa.feature.melspectrogram(wf, sr=sr, **DFLT_MEL_KWARGS)
+#         else:
+#             _assert_sample_rate_if_not_none(common_sr, sr)
+#             feat_mat = librosa.feature.melspectrogram(wf, sr=common_sr, **DFLT_MEL_KWARGS)
+#         return librosa.db_to_amplitude(feat_mat, ref=DFLT_MEL_MIN_AMP).T  # TODO: Look into
+#
+#
+#     def onset_strength_and_spectral_contrast(wf, sr):
+#         onset_strength = librosa.onset.onset_strength(wf, sr)
+#         spectral_contrast = librosa.feature.spectral_contrast(wf, sr)
+#         return np.vstack((onset_strength, spectral_contrast)).T  # TODO: Look into
+#
+#
+#     # TODO: Look into this!
+#     def intensity_and_spectral_features(wf, sr, tile_size=DFLT_TILE_SIZE, tile_step=None):
+#         tile_step = tile_step or tile_size
+#         S = abs_stft(wf, tile_size=tile_size, tile_step=tile_step)
+#         log_intensity = log(S.sum(axis=0) + 1)
+#         onset_strength = librosa.onset.onset_strength(sr=sr, S=S)
+#         spectral_centroid = librosa.feature.spectral_centroid(sr=sr, S=S, n_fft=tile_size, hop_length=tile_step)
+#         spectral_contrast = librosa.feature.spectral_contrast(sr=sr, S=S, n_fft=tile_size, hop_length=tile_step)
+#         return np.vstack((log_intensity, onset_strength, spectral_centroid, spectral_contrast)).T  # TODO: Look into
+# except ImportError as e:
+#     from warnings import warn
+#
+#     warn(str(e))
 
 
 def intensity_and_normalized_spectr(wf, sr=None, tile_size=DFLT_TILE_SIZE,
