@@ -71,7 +71,7 @@ def dacc_info_gen(on_error='ignore'):
                 print(f"Error with {submodule_dotpath}: {e}")
 
 
-daccs = dict(dacc_info_gen())
+daccs = dict(dacc_info_gen(on_error='ignore'))
 
 #
 # daccs = {}
