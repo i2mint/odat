@@ -72,35 +72,3 @@ def dacc_info_gen(on_error='ignore'):
 
 
 daccs = dict(dacc_info_gen(on_error='ignore'))
-
-#
-# daccs = {}
-#
-#
-#
-# with IgnoreAllErrors():
-#     from odat.mdat import sa
-#
-#     daccs['sa'] = {
-#         'description': 'Loose screws in rotating car dashboard',
-#         'dacc': sa.Dacc()
-#     }
-#
-#
-# with IgnoreAllErrors():
-#     from odat.mdat import xe
-#
-#     daccs['xe'] = {
-#         'description': 'Fridge compressor data',
-#         'dacc': xe.dacc
-#     }
-#
-# with IgnoreAllErrors():
-#     from odat.mdat import iatis
-#
-#     # daccs['iatis'] = {'blah': 'bloo'}
-#
-#     daccs['iatis'] = {
-#         'description': 'Over 5 million tagged sounds',
-#         'dacc': iatis.Dacc()
-#     }

@@ -14,10 +14,35 @@ DFLT_CHK_STEP = None
 DFLT_CHUNKER = partial(clever_chunker, tile_size=DFLT_CHK_SIZE, tile_step=DFLT_CHK_STEP)
 # A function to be applied to the raw fft output
 DFLT_SPECTRA_TRANS = lambda x: np.abs(x)
+dataname = 'ss1.zip'
+DFLT_WF_FOLDER = 'wav'
+
+DFLT_CONTEXT_FILENAME = 'Context_all.csv'
+
+######################### FILE PATHS AND STORES INITIALIZATION #########################
+dflt_path_templates = (
+    "{name}",  # dataname IS the path
+    "~/Downloads/{name}",  # can be found in Downloads
+    "~/odata/{name}",  # can be found in ~/odata
+    "~/{name}",  # can be found in home folder
+)
+normalize_path = lambda p: os.path.abspath(os.path.expanduser(p))
+
+
+def find_datapath(name, path_templates=dflt_path_templates):
+    path_options = map(lambda x: normalize_path(x.format(name=name)), path_templates)
+    r = next(filter(os.path.exists, path_options), None)
+    if r is None:
+        raise ValueError(f"Did not find a file named {name} in any of these folders: {dflt_path_templates}")
+    else:
+        return r
+
+
+DFLT_ZIP_FILE_PATH = find_datapath(dataname)
 
 
 ######################################### STORES ###########################################
-def mk_wf_store(zip_file_path, wf_folder):
+def mk_wf_store(zip_file_path=DFLT_ZIP_FILE_PATH, wf_folder=DFLT_WF_FOLDER):
     """
     Make a store accessing the wav files in the zip
     :param zip_file_path: str, path to the zip file
@@ -42,7 +67,7 @@ def mk_wf_store(zip_file_path, wf_folder):
     return wfs
 
 
-def mk_context_store(zip_file_path):
+def mk_context_store(zip_file_path=DFLT_ZIP_FILE_PATH):
     """
     Make a store accessing the csv files in the zip
     :param zip_file_path: str, path to the zip file
@@ -77,28 +102,9 @@ class AnnotStore(KvReader):
         return k in self.annots_df.index
 
 
-######################### FILE PATHS AND STORES INITIALIZATION #########################
-dflt_path_templates = (
-    "{name}",  # dataname IS the path
-    "~/Downloads/{name}",  # can be found in Downloads
-    "~/odata/{name}",  # can be found in ~/odata
-    "~/{name}",  # can be found in home folder
-)
-normalize_path = lambda p: os.path.abspath(os.path.expanduser(p))
-
-
-def find_datapath(name, path_templates=dflt_path_templates):
-    path_options = map(lambda x: normalize_path(x.format(name=name)), path_templates)
-    return next(filter(os.path.exists, path_options), None)
-
-
-dataname = 'SAS.zip'
-wf_folder = 'wav'
-zip_file_path = find_datapath(dataname)
-wfs = mk_wf_store(zip_file_path, wf_folder)
-context_store = mk_context_store(zip_file_path)
-context_name = 'context.csv'
-annots = AnnotStore(context_store[context_name], key_cols='filename')
+def mk_annots_store(zip_file_path=DFLT_ZIP_FILE_PATH, context_name=DFLT_CONTEXT_FILENAME):
+    context_store = mk_context_store(zip_file_path=zip_file_path)
+    return AnnotStore(context_store[context_name], key_cols='filename')
 
 
 ####################################### DATA ACCESS #######################################
@@ -108,12 +114,16 @@ class Dacc:
     """
 
     def __init__(self,
-                 wfs=wfs,
-                 annots=annots,
-                 annot_to_tag=lambda x: x.name,
-                 extra_info=lambda x: x.truth,
+                 wfs=mk_wf_store,
+                 annots=mk_annots_store,
+                 annot_to_tag=lambda x: x.truth,
+                 extra_info=lambda x: x.to_dict(),
                  chunker=DFLT_CHUNKER,
                  spectra_trans=DFLT_SPECTRA_TRANS):
+        if callable(wfs):  # if callable, consider it a factory, and make the annots
+            wfs = wfs()
+        if callable(annots):  # if callable, consider it a factory, and make the annots
+            annots = annots()
         self.wfs = wfs
         self.annots = annots
         self.annot_to_tag = annot_to_tag
@@ -125,7 +135,7 @@ class Dacc:
         self.spectra_trans = spectra_trans
 
     # this allows you to create an instance of the dacc class where the data is filtered out
-    # you could also filter out externaly, but this can be convenient
+    # you could also filter out externally, but this can be convenient
     @classmethod
     def with_key_filt(cls, key_filt, wfs, annots, annot_to_tag, extra_info, chunker, spectra_trans):
         filtered_annots = cached_keys(annots, keys_cache=key_filt)
@@ -142,7 +152,7 @@ class Dacc:
             try:
                 wf = self.wfs[k]
                 annot = self.annots[k]
-                yield wf, self.annot_to_tag(annot), self.extra_info(annot)
+                yield wf, self.annot_to_tag(annot)
             except KeyError:
                 pass
 
@@ -159,7 +169,7 @@ class Dacc:
 
 
 _meta = dict(
-    name='sa',
+    name='ss',
     description='Loose screws in rotating car dashboard',
     mk_dacc=Dacc
 )
