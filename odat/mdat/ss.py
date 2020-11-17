@@ -8,6 +8,7 @@ import pandas as pd
 import soundfile as sf
 from py2store import FilesOfZip, KvReader, wrap_kvs, filt_iter, cached_keys
 from odat.utils.chunkers import clever_chunker
+from odat.util import find_datapath
 
 DFLT_CHK_SIZE = 2048
 DFLT_CHK_STEP = None
@@ -18,25 +19,6 @@ dataname = 'ss1.zip'
 DFLT_WF_FOLDER = 'wav'
 
 DFLT_CONTEXT_FILENAME = 'Context_all.csv'
-
-######################### FILE PATHS AND STORES INITIALIZATION #########################
-dflt_path_templates = (
-    "{name}",  # dataname IS the path
-    "~/Downloads/{name}",  # can be found in Downloads
-    "~/odata/{name}",  # can be found in ~/odata
-    "~/{name}",  # can be found in home folder
-)
-normalize_path = lambda p: os.path.abspath(os.path.expanduser(p))
-
-
-def find_datapath(name, path_templates=dflt_path_templates):
-    path_options = map(lambda x: normalize_path(x.format(name=name)), path_templates)
-    r = next(filter(os.path.exists, path_options), None)
-    if r is None:
-        raise ValueError(f"Did not find a file named {name} in any of these folders: {dflt_path_templates}")
-    else:
-        return r
-
 
 DFLT_ZIP_FILE_PATH = find_datapath(dataname)
 

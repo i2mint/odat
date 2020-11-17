@@ -37,3 +37,25 @@ def submodules_of(pkg, include_init=True):
         return g
     else:
         return filter(lambda name: name != '__init__', g)
+
+
+import os
+
+######################### FILE PATHS AND STORES INITIALIZATION #########################
+# TODO: Move spec to config so it's editable
+dflt_path_templates = (
+    "{name}",  # dataname IS the path
+    "~/odat/{name}",  # can be found in ~/odat
+    "~/Downloads/{name}",  # can be found in Downloads
+    "~/{name}",  # can be found in home folder
+)
+normalize_path = lambda p: os.path.abspath(os.path.expanduser(p))
+
+
+def find_datapath(name, path_templates=dflt_path_templates):
+    path_options = map(lambda x: normalize_path(x.format(name=name)), path_templates)
+    r = next(filter(os.path.exists, path_options), None)
+    if r is None:
+        raise ValueError(f"Did not find a file named {name} in any of these folders: {dflt_path_templates}")
+    else:
+        return r
