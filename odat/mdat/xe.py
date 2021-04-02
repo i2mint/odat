@@ -1,7 +1,7 @@
 import os
 from functools import partial
 from py2store import myconfigs
-from py2store.ext.audio import WavLocalFileStore
+from hear import WavLocalFileStore
 from slang.core import KvDataSource
 import re
 import numpy as np
