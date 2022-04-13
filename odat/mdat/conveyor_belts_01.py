@@ -14,10 +14,11 @@ dataname = 'conveyor_states.zip'
 ASSERT_SR = 44100
 DFLT_ZIP_FILE_PATH = find_datapath(dataname)
 
+
 def get_wf(wav_bytes, assert_sr=ASSERT_SR):
     wf, sr = sf.read(BytesIO(wav_bytes))
     if assert_sr is not None:
-        assert sr == assert_sr, f"Sample rate was {sr}. I expected {assert_sr}"
+        assert sr == assert_sr, f'Sample rate was {sr}. I expected {assert_sr}'
     return wf
 
 
@@ -36,7 +37,8 @@ class Wavs(FilesOfZip):
 
 
 dflt_wf_to_spectr = wf_to_spectr_func(
-    tile_size=2048, tile_step=None, win_func=DFLT_WIN_FUNC)
+    tile_size=2048, tile_step=None, win_func=DFLT_WIN_FUNC
+)
 
 
 @dataclass
@@ -78,8 +80,4 @@ class Dacc:
         return self.spectras[idx], self.tags[idx]
 
 
-_meta = dict(
-    name='conveyor_belts_01.zip',
-    description='Conveyor belts',
-    mk_dacc=Dacc,
-)
+_meta = dict(name='conveyor_belts_01.zip', description='Conveyor belts', mk_dacc=Dacc,)

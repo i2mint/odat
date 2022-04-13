@@ -157,6 +157,12 @@ class Dacc:
                 yield sref, tag, get_wfsr(sref)
 
     @lazyprop
+    def wfs(self):
+        raise NotImplementedError(f"Not implemented, but could.")
+        # Example, get srefs from self.sref_tag_df. These are keys
+        # values can than be obtained through get_wfsr(sref)[0]
+
+    @lazyprop
     def sref_tag_store(self):
         return TagSrefs(self.sref_tag_df, 'tag')
 
