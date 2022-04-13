@@ -1,29 +1,39 @@
+from py2store import myconfigs
 from py2store.stores.local_store import RelativeDirPathFormatKeys, PickleStore
 from hear.session_block_stores import BlockWfStore, ScoopAnnotationsStore
 import numpy as np
+from functools import partial
 from sklearn.preprocessing import normalize, RobustScaler
 
+from odat.utils.chunkers import fixed_step_chunker
 
-def mk_dacc(root_dir):
+DFLT_CHUNKER = partial(fixed_step_chunker, chk_size=2048)
+
+config_filename = 'phone_digits_block.json'
+DFLT_LOCAL_SOURCE_DIR = myconfigs.get_config_value(config_filename, 'local_source_dir')
+
+
+def mk_dacc(root_dir=DFLT_LOCAL_SOURCE_DIR):
     return Dacc(root_dir=root_dir)
 
 
 class DirStore(RelativeDirPathFormatKeys):
     def __getitem__(self, k):
-        return self.__class__(self._id_of_key(k))
+        return type(self)(self._id_of_key(k))
 
     def __repr__(self):
         return self._prefix
 
 
 class Dacc:
-    def __init__(self, root_dir):
+    def __init__(self, root_dir=DFLT_LOCAL_SOURCE_DIR):
         self.root_store = DirStore(root_dir)
         self.audio_dir = self.root_store['data/c/macosx_built-in-mic']
         self.annots_dir = self.root_store['annotations/s']
         self.snips_dir = self.root_store['data/snips']
 
         self.block_store = BlockWfStore(channel_data_dir=self.audio_dir._prefix)
+        self.wfs = self.block_store  # consistency alias
 
         self.annots_store = ScoopAnnotationsStore(
             self.annots_dir._prefix,
@@ -43,7 +53,7 @@ class Dacc:
                 yield normal_wf, tag
                 # yield wf, tag
 
-    def chk_tag_gen(self, chunker):
+    def chk_tag_gen(self, chunker=DFLT_CHUNKER):
         for wf, tag in self.wf_tag_gen():
             for chk in chunker(wf):
                 yield chk, tag
