@@ -1,6 +1,8 @@
 # Note: You may want to use cmudict instead (pip install cmudict -- https://github.com/prosegrinder/python-cmudict)
 #   (Unless you want to parse the raw data yourself)
 
+import os
+
 url = 'https://github.com/Alexir/CMUdict/raw/master/cmudict-0.7b'
 
 
