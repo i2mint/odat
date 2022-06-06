@@ -22,18 +22,31 @@ def first_path_component(x):
         return m.group(0)
 
 
-def mk_kv_data_source(local_source_dir=DFLT_LOCAL_SOURCE_DIR,
-                      key_to_tag=first_path_component, key_filt=None):
-    assert local_source_dir is not None, "You need to specify the directory where your data is"
+def mk_kv_data_source(
+    local_source_dir=DFLT_LOCAL_SOURCE_DIR,
+    key_to_tag=first_path_component,
+    key_filt=None,
+):
+    assert (
+        local_source_dir is not None
+    ), 'You need to specify the directory where your data is'
     s = WavLocalFileStore(os.path.join(local_source_dir, '{tag}/{filename}.wav'))
     return KvDataSource(s, key_to_tag=key_to_tag, key_filt=key_filt)
 
 
-def mk_dacc(local_source_dir=DFLT_LOCAL_SOURCE_DIR,
-            key_to_tag=first_path_component,
-            wf_to_chk=DFLT_CHUNKER,
-            key_filt=None):
-    assert local_source_dir is not None, "You need to specify the directory where your data is"
+def mk_dacc(
+    local_source_dir=DFLT_LOCAL_SOURCE_DIR,
+    key_to_tag=first_path_component,
+    wf_to_chk=DFLT_CHUNKER,
+    key_filt=None,
+):
+    assert (
+        local_source_dir is not None
+    ), 'You need to specify the directory where your data is'
+    assert os.path.isdir(
+        local_source_dir
+    ), f"Couldn't find this directory: {local_source_dir}"
+
     s = WavLocalFileStore(os.path.join(local_source_dir, '{tag}/{filename}.wav'))
 
     class Dacc(KvDataSource):
@@ -48,8 +61,4 @@ def mk_dacc(local_source_dir=DFLT_LOCAL_SOURCE_DIR,
     return Dacc(s, key_to_tag=key_to_tag, key_filt=key_filt)
 
 
-_meta = dict(
-    name='xe',
-    description='Fridge compressor data',
-    mk_dacc=mk_dacc
-)
+_meta = dict(name='xe', description='Fridge compressor data', mk_dacc=mk_dacc)
