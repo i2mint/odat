@@ -1,7 +1,7 @@
 """
 Utils to create daccs from dags
 """
-from meshed import DAG
+from meshed import DAG, code_to_dag
 from typing import Iterable
 
 
