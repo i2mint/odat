@@ -51,12 +51,24 @@ class Dacc:
             yield normal_wf, tag, train
 
     def chk_tag_train_gen(self, chunker=DFLT_CHUNKER):
-        for wf, tag, train in self.wf_tag_gen():
+        for wf, tag, train in self.wf_tag_train_gen():
             for chk in chunker(wf):
                 yield chk, tag, train
 
+    def mk_Xy(self):  # TODO use a groupby here
+        X_train, y_train, X_test, y_test = [], [], [], []
+        for chk, tag, train in self.chk_tag_train_gen():
+            if train == "train":
+                X_train.append(chk)
+                y_train.append(tag)
+            elif train == "test":
+                X_test.append(chk)
+                y_test.append(tag)
+            else:
+                continue
+        return X_train, y_train, X_test, y_test
+
 
 if __name__ == "__main__":
-    # print(DFLT_LOCAL_SOURCE_DIR)
     dacc = mk_dacc()
-    print(next(dacc.chk_tag_gen()))
+    print(next(dacc.chk_tag_train_gen()))
