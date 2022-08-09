@@ -66,7 +66,7 @@ class Dacc:
                 y_test.append(tag)
             else:
                 continue
-        return X_train, y_train, X_test, y_test
+        return np.array(X_train), y_train, np.array(X_test), y_test
 
 
 if __name__ == "__main__":
