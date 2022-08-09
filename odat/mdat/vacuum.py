@@ -41,17 +41,19 @@ class Dacc:
     def __init__(self, root_dir=DFLT_LOCAL_SOURCE_DIR):
         self.wfs = WavLocalFileStore(root_dir)
 
-    def wf_tag_gen(self):
+    def wf_tag_train_gen(self):
         for key in self.wfs:
             signal = self.wfs[key]
+            train = key.split("/")[0]
+            tag = key.split("/")[1].split(".")[0]
             normal_wf = normalize(np.float32(signal).reshape(1, -1))[0]
 
-            yield normal_wf, key
+            yield normal_wf, tag, train
 
-    def chk_tag_gen(self, chunker=DFLT_CHUNKER):
-        for wf, tag in self.wf_tag_gen():
+    def chk_tag_train_gen(self, chunker=DFLT_CHUNKER):
+        for wf, tag, train in self.wf_tag_gen():
             for chk in chunker(wf):
-                yield chk, tag
+                yield chk, tag, train
 
 
 if __name__ == "__main__":
