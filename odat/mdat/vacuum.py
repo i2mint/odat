@@ -11,7 +11,17 @@ from odat.utils.chunkers import fixed_step_chunker
 DFLT_CHUNKER = partial(fixed_step_chunker, chk_size=2048)
 
 config_filename = "vacuum.json"
-DFLT_LOCAL_SOURCE_DIR = myconfigs.get_config_value(config_filename, "local_source_dir")
+
+
+def create_source_dir(fname):
+    try:
+        result = myconfigs.get_config_value(config_filename, "local_source_dir")
+        return result
+    except TypeError:
+        print(f"A config_filename called {config_filename} needs to be present")
+
+
+DFLT_LOCAL_SOURCE_DIR = create_source_dir(config_filename)
 
 
 def mk_dacc(root_dir=DFLT_LOCAL_SOURCE_DIR):
@@ -45,5 +55,6 @@ class Dacc:
 
 
 if __name__ == "__main__":
+    # print(DFLT_LOCAL_SOURCE_DIR)
     dacc = mk_dacc()
     print(next(dacc.chk_tag_gen()))
