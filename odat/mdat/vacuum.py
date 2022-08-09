@@ -7,8 +7,10 @@ from dol import wrap_kvs
 import soundfile as sf
 from io import BytesIO
 from odat.utils.chunkers import fixed_step_chunker
+from slang.featurizers import tile_fft
 
 DFLT_CHUNKER = partial(fixed_step_chunker, chk_size=2048)
+DFLT_FEATURIZER = tile_fft
 
 config_filename = "vacuum.json"
 
@@ -55,14 +57,18 @@ class Dacc:
             for chk in chunker(wf):
                 yield chk, tag, train
 
+    def fvs_tag_train_gen(self, featurizer=DFLT_FEATURIZER):
+        for chk, tag, train in self.chk_tag_train_gen():
+            yield featurizer(chk), tag, train
+
     def mk_Xy(self):  # TODO use a groupby here
         X_train, y_train, X_test, y_test = [], [], [], []
-        for chk, tag, train in self.chk_tag_train_gen():
+        for fv, tag, train in self.fvs_tag_train_gen():
             if train == "train":
-                X_train.append(chk)
+                X_train.append(fv)
                 y_train.append(tag)
             elif train == "test":
-                X_test.append(chk)
+                X_test.append(fv)
                 y_test.append(tag)
             else:
                 continue
