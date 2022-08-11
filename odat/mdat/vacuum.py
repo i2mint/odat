@@ -8,6 +8,8 @@ import soundfile as sf
 from io import BytesIO
 from odat.utils.chunkers import fixed_step_chunker
 from slang.featurizers import tile_fft
+import pandas as pd
+
 
 DFLT_CHUNKER = partial(fixed_step_chunker, chk_size=2048)
 DFLT_FEATURIZER = tile_fft
@@ -24,6 +26,17 @@ def create_source_dir(fname):
 
 
 DFLT_LOCAL_SOURCE_DIR = create_source_dir(config_filename)
+DFLT_ANNOTS_COLS = ["srefs", "tag", "train_info", "full_tag"]
+
+
+def extract_annot_info(sref):
+    train_info, classification = sref.split("/")
+    annot, full_annot, *rest = classification.split(".")
+    return sref, annot, train_info, full_annot
+
+
+def annot_columns(srefs):
+    return list(map(extract_annot_info, srefs))
 
 
 def mk_dacc(root_dir=DFLT_LOCAL_SOURCE_DIR):
@@ -42,6 +55,17 @@ def WfStore(root_store):
 class Dacc:
     def __init__(self, root_dir=DFLT_LOCAL_SOURCE_DIR):
         self.wfs = WavLocalFileStore(root_dir)
+
+    def mk_annots(self):
+        srefs = self.wfs.keys()
+        annots = annot_columns(srefs)
+        return annots
+
+    def mk_annots_df(self):
+        annots = self.mk_annots()
+        columns = DFLT_ANNOTS_COLS
+        df = pd.DataFrame(annots, columns=columns)
+        return df
 
     def wf_tag_train_gen(self):
         for key in self.wfs:
