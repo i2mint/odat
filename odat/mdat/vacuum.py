@@ -61,7 +61,8 @@ class Dacc:
         annots = annot_columns(srefs)
         return annots
 
-    def mk_annots_df(self):
+    @property
+    def annots_df(self):
         annots = self.mk_annots()
         columns = DFLT_ANNOTS_COLS
         df = pd.DataFrame(annots, columns=columns)
