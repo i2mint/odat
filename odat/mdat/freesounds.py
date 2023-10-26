@@ -38,14 +38,21 @@ from slang import KvDataSource
 
 
 def mk_dacc(
-    raw_store=None, *, audio_key='audio_train/', annots_key='train_post_competition.csv'
+    raw_store=None,
+    *,
+    audio_key='audio_train/',
+    annots_key='train_post_competition.csv',
+    annots_table_key_col='fname',
+    annots_table_tag_col='label',
 ):
     if raw_store is None:
         zip_filepath = config_getter('freesounds_audio_dataset_local_zip_filepath')
         raw_store = FreesoundsDataset(zip_filepath)
 
     audio_store = raw_store[audio_key]
-    annots_store = annots_store.set_index('fname').label.to_dict()
+    annots_store = (
+        raw_store[annots_key].set_index(annots_table_key_col)[annots_table_tag_col]
+    ).to_dict()
     dacc = KvDataSource(
         kv_store=audio_store,
         key_to_tag=annots_store.get,
@@ -55,6 +62,8 @@ def mk_dacc(
         dacc.tags = list(dacc.tag_counts)
     except Exception:
         pass
+
+    return dacc
 
 
 _meta = dict(
