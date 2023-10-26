@@ -1,3 +1,4 @@
+from collections import Counter
 from dol import wrap_kvs, add_prefix_filtering, add_ipython_key_completions
 from dol import FilesOfZip
 from config2py import config_getter
@@ -44,11 +45,16 @@ def mk_dacc(
         raw_store = FreesoundsDataset(zip_filepath)
 
     audio_store = raw_store[audio_key]
-    annots_store = raw_store[annots_key]
-    return KvDataSource(
+    annots_store = annots_store.set_index('fname').label.to_dict()
+    dacc = KvDataSource(
         kv_store=audio_store,
-        key_to_tag=annots_store.set_index('fname').label.to_dict().get,
+        key_to_tag=annots_store.get,
     )
+    try:
+        dacc.tag_counts = dict(Counter(annots_store.values()).most_common())
+        dacc.tags = list(dacc.tag_counts)
+    except Exception:
+        pass
 
 
 _meta = dict(
