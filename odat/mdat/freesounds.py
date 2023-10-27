@@ -1,3 +1,9 @@
+"""
+Data accessor for the freesounds dataset:
+https://zenodo.org/records/2552860#.XFD05fwo-V4
+
+"""
+
 from collections import Counter
 from dol import wrap_kvs, add_prefix_filtering, add_ipython_key_completions
 from dol import FilesOfZip
