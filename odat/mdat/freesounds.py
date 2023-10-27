@@ -40,10 +40,11 @@ class FreesoundsDataset(FilesOfZip):
     """A base store for the freesounds audio dataset."""
 
 
+from functools import partial
 from slang import KvDataSource
 
 
-def mk_dacc(
+def _mk_dacc(
     raw_store=None,
     *,
     audio_key='audio_train/',
@@ -70,6 +71,25 @@ def mk_dacc(
         pass
 
     return dacc
+
+
+mk_train_dacc = partial(
+    _mk_dacc,
+    audio_key='audio_train/',
+    annots_key='train_post_competition.csv',
+    annots_table_key_col='fname',
+    annots_table_tag_col='label',
+)
+
+mk_test_dacc = partial(
+    _mk_dacc,
+    audio_key='audio_test/',
+    annots_key='test_post_competition.csv',
+    annots_table_key_col='fname',
+    annots_table_tag_col='label',
+)
+
+mk_dacc = mk_train_dacc
 
 
 _meta = dict(
