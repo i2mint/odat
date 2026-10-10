@@ -1,13 +1,14 @@
 from itertools import islice
-from typing import Optional, Iterable
+from typing import Optional
+from collections.abc import Iterable
 
 
 def fixed_step_chunker(
         it: Iterable,
         chk_size: int,
-        chk_step: Optional[int] = None,
-        start_at: Optional[int] = None,
-        stop_at: Optional[int] = None,
+        chk_step: int | None = None,
+        start_at: int | None = None,
+        stop_at: int | None = None,
         return_tail: bool = False):
     """
       a function to get (an iterator of) segments (bt, tt) of chunks from an iterator (or list)

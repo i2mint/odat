@@ -127,7 +127,7 @@ def wf_to_spectr_func(tile_size=DFLT_TILE_SIZE, tile_step=None, win_func=None):
 dflt_wf_to_spectr = wf_to_spectr_func()
 
 
-class Spectr(object):
+class Spectr:
     def __init__(self, tile_size=DFLT_TILE_SIZE, tile_step=None, win_func=DFLT_WIN_FUNC, **lin_trans_kwargs):
         self.tile_size = tile_size
         if tile_step is None:
@@ -209,4 +209,4 @@ def log_spectr(wf, sr=None, tile_size=DFLT_TILE_SIZE, tile_step=None):
 
 def _assert_sample_rate_if_not_none(assert_sr, sr=None):
     if sr is not None and sr != assert_sr:
-        raise SampleRateAssertionError("Sample rate was {}: Should be {}".format(sr, assert_sr))
+        raise SampleRateAssertionError(f"Sample rate was {sr}: Should be {assert_sr}")

@@ -3,7 +3,7 @@ import soundfile as sf
 from io import BytesIO
 import re
 from dataclasses import dataclass
-from typing import Callable
+from collections.abc import Callable
 
 import numpy as np
 
@@ -22,7 +22,7 @@ def get_wf(wav_bytes, assert_sr=ASSERT_SR):
     return wf
 
 
-key_to_tag_pattern = re.compile('(\w+).wav$')
+key_to_tag_pattern = re.compile(r'(\w+).wav$')
 
 
 def key_to_tag(key):
