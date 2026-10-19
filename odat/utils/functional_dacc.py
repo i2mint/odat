@@ -4,7 +4,7 @@ Utils to create daccs from dags
 
 
 from meshed import DAG, code_to_dag
-from typing import Iterable
+from collections.abc import Iterable
 
 
 def get_intermediate_nodes(dag: DAG):

@@ -17,7 +17,7 @@ def ddir(obj):
     return [attr for attr in dir(obj) if not attr.startswith('_')]
 
 
-spaces_re = re.compile('\s+')
+spaces_re = re.compile(r'\s+')
 
 
 def print_attrs(obj, with_doc_snippet=True, max_doc_length=73, sep='\n'):
